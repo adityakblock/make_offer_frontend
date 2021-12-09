@@ -1,0 +1,202 @@
+diff --git a/example1/app/src/App.js b/example1/app/src/App.js
+index 22bac08..8ea5543 100644
+--- a/example1/app/src/App.js
++++ b/example1/app/src/App.js
+@@ -235,6 +235,8 @@ function App() {
+     const [mint, mintBump] = await anchor.web3.PublicKey.findProgramAddress([Buffer.from("mint")], program.programId);
+     const [mintAuthority, mintAuthorityBump] = await anchor.web3.PublicKey.findProgramAddress([Buffer.from("mint-authority")], program.programId);
+ 
++    console.log("MINT is ", mint.toString())
++    console.log("MintBump is,", mintBump.toString())
+     let userTokenAccount = await spl.Token.getAssociatedTokenAddress(
+       spl.ASSOCIATED_TOKEN_PROGRAM_ID,
+       spl.TOKEN_PROGRAM_ID,
+@@ -263,6 +265,62 @@ function App() {
+ 
+ 
+ 
++    // const account = await program.account.baseAccount.fetch(baseAccount.publicKey);
++    // console.log('account: ', account);
++    // setValue(account.count.toString());
++  }
++
++  async function setAuthority2() {
++
++    const provider = await getProvider();
++    const program = new Program(idl, programID, provider);
++
++    const [mint, mintBump] = await anchor.web3.PublicKey.findProgramAddress([Buffer.from("mint")], program.programId);
++    const [mintAuthority, mintAuthorityBump] = await anchor.web3.PublicKey.findProgramAddress([Buffer.from("mint-authority")], program.programId);
++    spl.Token.setAuthority(mint, mintAuthority, 'MintTokens', program.provider.wallet.PublicKey);
++    
++
++    while ((await program.provider.connection.getSignatureStatus(tx0)).value.confirmations === 0) {
++      // waiting for confirmation
++    
++  }
++  async function setAuthority() {
++
++    const provider = await getProvider();
++    const program = new Program(idl, programID, provider);
++
++    const [mint, mintBump] = await anchor.web3.PublicKey.findProgramAddress([Buffer.from("mint")], program.programId);
++    const [mintAuthority, mintAuthorityBump] = await anchor.web3.PublicKey.findProgramAddress([Buffer.from("mint-authority")], program.programId);
++
++    console.log("MINT is ", mint.toString())
++    console.log("MintBump is,", mintBump.toString())
++    let userTokenAccount = await spl.Token.getAssociatedTokenAddress(
++      spl.ASSOCIATED_TOKEN_PROGRAM_ID,
++      spl.TOKEN_PROGRAM_ID,
++      mint,
++      program.provider.wallet.publicKey,
++    );
++    // spl.Token.setAuthority(mint, mintAuthority, spl.mintAuthority, program.provider.wallet.PublicKey);
++      console.log('damn')
++    let tx0 = await program.state.rpc.changeAuthority(mintBump, mintAuthorityBump, {
++      accounts: {
++        mint: mint,
++        wallet: program.provider.wallet.publicKey,
++        mintAuthority: mintAuthority,
++        systemProgram: anchor.web3.SystemProgram.programId,
++        tokenProgram: spl.TOKEN_PROGRAM_ID,
++        associatedTokenProgram: spl.ASSOCIATED_TOKEN_PROGRAM_ID,
++        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
++      },
++    });
++
++    while ((await program.provider.connection.getSignatureStatus(tx0)).value.confirmations === 0) {
++      // waiting for confirmation
++    }
++    getSaleData();
++
++
++
+     // const account = await program.account.baseAccount.fetch(baseAccount.publicKey);
+     // console.log('account: ', account);
+     // setValue(account.count.toString());
+@@ -284,6 +342,7 @@ function App() {
+           <button onClick={increment}>Buy NMC</button>
+           <br />
+           <button onClick={getSaleData}>sale stats</button>
++          <button onClick={setAuthority}>Change authority</button>
+ 
+ 
+ 
+diff --git a/example1/app/src/myidl.json b/example1/app/src/myidl.json
+index 5ba9058..1bb37c1 100644
+--- a/example1/app/src/myidl.json
++++ b/example1/app/src/myidl.json
+@@ -19,6 +19,10 @@
+           {
+             "name": "price",
+             "type": "u64"
++          },
++          {
++            "name": "lostAuthority",
++            "type": "bool"
+           }
+         ]
+       }
+@@ -79,6 +83,56 @@
+           }
+         ]
+       },
++      {
++        "name": "changeAuthority",
++        "accounts": [
++          {
++            "name": "mint",
++            "isMut": true,
++            "isSigner": false
++          },
++          {
++            "name": "wallet",
++            "isMut": true,
++            "isSigner": true
++          },
++          {
++            "name": "mintAuthority",
++            "isMut": false,
++            "isSigner": false
++          },
++          {
++            "name": "systemProgram",
++            "isMut": false,
++            "isSigner": false
++          },
++          {
++            "name": "tokenProgram",
++            "isMut": false,
++            "isSigner": false
++          },
++          {
++            "name": "associatedTokenProgram",
++            "isMut": false,
++            "isSigner": false
++          },
++          {
++            "name": "rent",
++            "isMut": false,
++            "isSigner": false
++          }
++        ],
++        "args": [
++          {
++            "name": "mintBump",
++            "type": "u8"
++          },
++          {
++            "name": "mintAuthorityBump",
++            "type": "u8"
++          }
++        ]
++      },
+       {
+         "name": "mintSomeTokens",
+         "accounts": [
+@@ -142,6 +196,6 @@
+     ]
+   },
+   "metadata": {
+-    "address": "45hSuV9sVahmeQgjD6X9BGy8aBjfzLRkiixBbhNBorBH"
++    "address": "HrxAJ9pqRr42dAK4fvVkxkqSgpdZxRtHkmAqnRXhFgCc"
+   }
+ }
+\ No newline at end of file
+diff --git a/example1/app/yarn.lock b/example1/app/yarn.lock
+index 4368f1b..6cb9379 100644
+--- a/example1/app/yarn.lock
++++ b/example1/app/yarn.lock
+@@ -1800,10 +1800,10 @@
+     snake-case "^3.0.4"
+     toml "^3.0.0"
+ 
+-"@project-serum/anchor@^0.9.0":
+-  version "0.9.0"
+-  resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.9.0.tgz#c3ec42566a8adb6d279a4909d3342a5d23ee9cbe"
+-  integrity sha512-pnjkwJ51Id7XPRkVM/JfzXuN4B/OX6kbt5jY1nmHDhxAur+S3TIjCvWa+IPVSUIgMyVck/ccMLwCdj0wXPAviQ==
++"@project-serum/anchor@^0.18.0":
++  version "0.18.0"
++  resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.18.0.tgz#867144282e59482230f797f73ee9f5634f846061"
++  integrity sha512-WTm+UB93MoxyCbjnHIibv/uUEoO/5gL4GEtE/aMioLF8Z4i0vCMPnvAN0xpk9VBu3t7ld2DcCE/L+6Z7dwU++w==
+   dependencies:
+     "@project-serum/borsh" "^0.2.2"
+     "@solana/web3.js" "^1.17.0"
+@@ -1914,7 +1914,7 @@
+   dependencies:
+     buffer "~6.0.3"
+ 
+-"@solana/spl-token@^0.1.6":
++"@solana/spl-token@^0.1.6", "@solana/spl-token@^0.1.8":
+   version "0.1.8"
+   resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.1.8.tgz#f06e746341ef8d04165e21fc7f555492a2a0faa6"
+   integrity sha512-LZmYCKcPQDtJgecvWOgT/cnoIQPWjdH+QVyzPcFvyDUiT0DiRjZaam4aqNUyvchLFhzgunv3d9xOoyE34ofdoQ==
+@@ -2134,7 +2134,7 @@
+     superstruct "^0.14.2"
+     tweetnacl "^1.0.0"
+ 
+-"@solana/web3.js@^1.18.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0":
++"@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.30.2":
+   version "1.30.2"
+   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.30.2.tgz#e85da75e0825dc64f53eb64a1ff0115b27bec135"
+   integrity sha512-hznCj+rkfvM5taRP3Z+l5lumB7IQnDrB4l55Wpsg4kDU9Zds8pE5YOH5Z9bbF/pUzZJKQjyBjnY/6kScBm3Ugg==
