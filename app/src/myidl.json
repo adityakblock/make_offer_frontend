@@ -44,6 +44,11 @@
           "name": "tokenrent",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "pdaRentAccount",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": [
@@ -126,12 +131,12 @@
           "type": "u8"
         },
         {
-          "name": "nftOfferAmount",
-          "type": "u64"
-        },
-        {
           "name": "offerValid",
           "type": "i64"
+        },
+        {
+          "name": "nftOfferAmount",
+          "type": "u64"
         }
       ]
     },
@@ -140,6 +145,11 @@
       "accounts": [
         {
           "name": "offer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stick",
           "isMut": true,
           "isSigner": false
         },
@@ -250,8 +260,16 @@
           "type": "u8"
         },
         {
+          "name": "stickBump",
+          "type": "u8"
+        },
+        {
           "name": "dataBump",
           "type": "u8"
+        },
+        {
+          "name": "offerValid",
+          "type": "i64"
         }
       ]
     },
@@ -313,6 +331,115 @@
         {
           "name": "offerBump",
           "type": "u8"
+        },
+        {
+          "name": "offerValid",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "closeOfferPda",
+      "accounts": [
+        {
+          "name": "offer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "offerMaker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dataAcc",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pdaRent",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "offerBump",
+          "type": "u8"
+        },
+        {
+          "name": "offerValid",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "closeStickPda",
+      "accounts": [
+        {
+          "name": "stick",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "offerMaker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "offerTaker",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nftMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dataAcc",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pdaRent",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "stickBump",
+          "type": "u8"
+        },
+        {
+          "name": "offerValid",
+          "type": "i64"
         }
       ]
     }
@@ -332,7 +459,11 @@
             "type": "u64"
           },
           {
-            "name": "rent",
+            "name": "ataRent",
+            "type": "publicKey"
+          },
+          {
+            "name": "pdaRent",
             "type": "publicKey"
           },
           {
@@ -352,6 +483,10 @@
             "type": "publicKey"
           },
           {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
             "name": "offerMadeFor",
             "type": "publicKey"
           },
@@ -364,12 +499,46 @@
             "type": {
               "option": "i64"
             }
+          },
+          {
+            "name": "offerExpired",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Stick",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maker",
+            "type": "publicKey"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "taker",
+            "type": "publicKey"
+          },
+          {
+            "name": "offerValidTill",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "offerExpired",
+            "type": "bool"
           }
         ]
       }
     }
   ],
   "metadata": {
-    "address": "8WLksD98G274bjxzrPRxLhdLQKbD1YJjJfY6FuTJZtZi"
+    "address": "DdJumnZ17cGxxYt9RbRoCPBbXK3F8BKyc9u1Lv8kGwJY"
   }
 }

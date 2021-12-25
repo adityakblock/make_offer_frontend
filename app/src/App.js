@@ -22,15 +22,19 @@ import { off } from 'process';
 import { token } from '@project-serum/anchor/dist/cjs/utils';
 
 
-let tokenRentAddress = new anchor.web3.PublicKey(accountsJson.config.tokenRentAddress);
+let pdaRentAddress = new anchor.web3.PublicKey(accountsJson.config.pda_rent_account);
 let marketPlace = new anchor.web3.PublicKey(accountsJson.config.marketplace_revenue_address);
 let creator0 = new anchor.web3.PublicKey(accountsJson.nft.creator0);
 let creator1 = new anchor.web3.PublicKey(accountsJson.nft.creator1);
-const keypair = anchor.web3.Keypair.generate();
-//let creator1 = keypair.publicKey;
-let creator2 = keypair.publicKey;
-let creator3 = keypair.publicKey;
-let creator4 = keypair.publicKey;
+
+let creator2 = new anchor.web3.PublicKey(accountsJson.nft.creator2);
+let creator3 = new anchor.web3.PublicKey(accountsJson.nft.creator3);
+let creator4 = new anchor.web3.PublicKey(accountsJson.nft.creator4);
+let offer_price = parseFloat(accountsJson.nft.offer_price);
+
+let offervalid = new anchor.BN(parseInt(accountsJson.nft.offer_valid));
+
+let initializer = new anchor.web3.PublicKey(accountsJson.config.contract_initializer);
 
 const wallets = [
   /* view list of available wallets at https://github.com/solana-labs/wallet-adapter#wallets */
@@ -44,7 +48,7 @@ const opts = {
   preflightCommitment: "processed"
 }
 const programID = new PublicKey(idl.metadata.address);
-console.log('address of program', programID.toString());
+//console.log('address of program', programID.toString());
 
 //let offer = anchor.web3.Keypair.generate();
 let offerMk = new anchor.web3.PublicKey(accountsJson.nft.maker);
@@ -80,6 +84,7 @@ function App() {
     console.log(program.provider);
 
 
+
     console.log('wallet ', program.provider.wallet.publicKey.toString());
 
     const [dataAccAddress, dataAccAddressBump] = await anchor.web3.PublicKey.findProgramAddress(
@@ -87,26 +92,74 @@ function App() {
       program.programId
     );
 
+    console.log("DATAACC ADDRESS is", dataAccAddress.toString());
+    const [backupdataAccAddress, backupdataAccAddressBump] = await anchor.web3.PublicKey.findProgramAddress(
+      [Buffer.from("backup_data")],
+      program.programId
+    );
     const accounts = {
       dataAcc: dataAccAddress,
+      backupDataAcc: backupdataAccAddress,
       payer: program.provider.wallet.publicKey,
       beneficiary: marketPlace,
-      rentAccount: tokenRentAddress,
       tokenProgram:spl.TOKEN_PROGRAM_ID,
       systemProgram:anchor.web3.SystemProgram.programId,
       rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-      tokenrent: tokenRentAddress,
+      pdaRentAccount: pdaRentAddress
     }
-    let mkCut =  new anchor.BN(25);
-    let rentCut = new anchor.BN(1);
 
-    const tx = await program.rpc.new(dataAccAddressBump,  mkCut, rentCut, {
+    let mkCut =  new anchor.BN(25);
+
+    console.log("LOGGING DICT", accounts.dataAcc.toString());
+
+    const tx = await program.rpc.new(dataAccAddressBump,  mkCut, {
       accounts: accounts,
       signers: []
     })
+
     console.log(tx);
 
   }
+
+  async function updatePda() {
+    const provider = await getProvider();
+    const program = new Program(idl, programID, provider);
+    console.log(program.programId.toString())
+
+    console.log(program.provider);
+
+
+    console.log('wallet ', program.provider.wallet.publicKey.toString());
+
+    const [dataAccAddress, dataAccAddressBump] = await anchor.web3.PublicKey.findProgramAddress(
+      [Buffer.from("data")],
+      program.programId
+    );
+    const [backupdataAccAddress, backupdataAccAddressBump] = await anchor.web3.PublicKey.findProgramAddress(
+      [Buffer.from("backup_data")],
+      program.programId
+    );
+
+    const accounts = {
+      dataAcc: dataAccAddress,
+      backupdataAccAddress: backupdataAccAddress,
+      payer: program.provider.wallet.publicKey,
+      tokenProgram:spl.TOKEN_PROGRAM_ID,
+      systemProgram:anchor.web3.SystemProgram.programId,
+      rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+      pdaRent: new anchor.web3.PublicKey(accountsJson.config.pda_rent),
+      initializer: initializer,
+    }
+
+    const tx = await program.rpc.updatePda({
+      accounts: accounts,
+      signers: []
+    })
+
+    console.log(tx);
+
+  }
+
   async function makeOfferForNft() {
 
     const provider = await getProvider();
@@ -115,7 +168,7 @@ function App() {
 
     console.log(program.provider);
 
-
+    
     console.log('wallet ', program.provider.wallet.publicKey.toString())
 
    
@@ -127,9 +180,13 @@ function App() {
       NFTTokenMint,
       program.provider.wallet.publicKey,
     );
+    let offervalid = new anchor.BN(1639899829);
+    let offer_valid_buffer = offervalid.toArrayLike(Buffer, 'be', 8);
+    console.log(offer_valid_buffer)
+    console.log(program.provider.wallet.publicKey.toBuffer());
 
     const [offerBufferAddress, offerBufferAddressBump] = await anchor.web3.PublicKey.findProgramAddress(
-      [program.provider.wallet.publicKey.toBuffer(), NFTTokenMint.toBuffer()],
+      [program.provider.wallet.publicKey.toBuffer(), NFTTokenMint.toBuffer(), offervalid.toArrayLike(Buffer, 'be', 8)],
       program.programId
     );
     
@@ -148,19 +205,21 @@ function App() {
       nftMint: NFTTokenMint,
       offerMakersNftAccount:NFTTokenAccount,
       dataAcc: dataAccAddress,
+
       tokenProgram:spl.TOKEN_PROGRAM_ID,
       systemProgram:anchor.web3.SystemProgram.programId,
       associatedTokenProgram:spl.ASSOCIATED_TOKEN_PROGRAM_ID,
       rent:anchor.web3.SYSVAR_RENT_PUBKEY,
       clock:anchor.web3.SYSVAR_CLOCK_PUBKEY,
-      tokenrent: tokenRentAddress,
     }
-    //console.log(accounts.rent.toString(), accounts.tokenProgram.toString(), accounts.systemProgram.toString(), accounts.associatedTokenProgram.toString());
-    console.log(accounts);
-    let offerAmount =  new anchor.BN(10 ** 9);
-    let offervalid = new anchor.BN(1639231703);
 
-    const tx = await program.rpc.makeOfferForNft(offerBufferAddressBump, offerAmount, offervalid, {
+
+
+    let offerAmount =  new anchor.BN(offer_price * 10 ** 9);
+
+    console.log("offervalid is", offervalid.toString());
+
+    const tx = await program.rpc.makeOfferForNft(offerBufferAddressBump, offervalid, offerAmount, {
       accounts: accounts,
       signers: []
     })
@@ -199,7 +258,12 @@ function App() {
     console.log("Offer Maker ATA", OfferMakerNFTTokenAccount.toString());
       let temp = offerMk;
     const [offerBufferAddress, offerBufferAddressBump] = await anchor.web3.PublicKey.findProgramAddress(
-      [temp.toBuffer(), NFTTokenMint.toBuffer()],
+      [temp.toBuffer(), NFTTokenMint.toBuffer(), offervalid.toArrayLike(Buffer, 'be', 8)],
+      program.programId
+    );
+
+    const [stickBufferAddress, stickBufferAddressBump] = await anchor.web3.PublicKey.findProgramAddress(
+      [temp.toBuffer(), NFTTokenMint.toBuffer(), program.provider.wallet.publicKey.toBuffer(), offervalid.toArrayLike(Buffer, 'be', 8)],
       program.programId
     );
 
@@ -230,6 +294,7 @@ function App() {
 
     const accounts = {
       offer:offerBufferAddress,
+      stick:stickBufferAddress,
       nftMint:NFTTokenMint,
       offerMaker:offerMk,
       offerTaker: program.provider.wallet.publicKey,
@@ -243,7 +308,8 @@ function App() {
       systemProgram: anchor.web3.SystemProgram.programId,
       rent: anchor.web3.SYSVAR_RENT_PUBKEY,
       clock:anchor.web3.SYSVAR_CLOCK_PUBKEY,
-      tokenrent: tokenRentAddress,
+   
+     
       dataAcc: dataAccAddress,
       creator0: creator0,
       creator1: creator1,
@@ -253,8 +319,7 @@ function App() {
     }
     //console.log(accounts.rent.toString(), accounts.tokenProgram.toString(), accounts.systemProgram.toString(), accounts.associatedTokenProgram.toString());
 
-    let offerTakerAmount = new anchor.BN(10 ** 9);
-    const tx = await program.rpc.accept( offerBufferAddressBump, dataAccAddressBump, {
+    const tx = await program.rpc.accept( offerBufferAddressBump, stickBufferAddressBump, dataAccAddressBump, offervalid, {
       accounts: accounts,
       signers: []
     });
@@ -271,7 +336,7 @@ function App() {
     // setValue(account.count.toString());
   }
 
-  async function CancelListing() {
+  async function CancelOffer() {
 
     const provider = await getProvider();
     const program = new Program(idl, programID, provider);
@@ -282,6 +347,10 @@ function App() {
 
     console.log('wallet ', program.provider.wallet.publicKey.toString())
 
+    const idk = await program.account.offer.all();
+    console.log(idk);
+
+
     let NFTTokenMint = nftPubKey;
     let NFTTokenAccount = await spl.Token.getAssociatedTokenAddress(
       spl.ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -290,7 +359,7 @@ function App() {
       program.provider.wallet.publicKey,
     );
 
-    let offerMakerAccount = new anchor.web3.PublicKey(accountsJson.nft.seller);
+    let offerMakerAccount = new anchor.web3.PublicKey(accountsJson.nft.maker);
     const [offerBufferAddress, offerBufferAddressBump] = await anchor.web3.PublicKey.findProgramAddress(
       [offerMakerAccount.toBuffer(), NFTTokenMint.toBuffer()],
       program.programId
@@ -299,10 +368,7 @@ function App() {
     console.log("Offer BUffer Address is", offerBufferAddress.toString())
     
 
-    const [escrowedMakerTokens, escrowedMakerTokensBump] = await anchor.web3.PublicKey.findProgramAddress(
-      [offerBufferAddress.toBuffer()],
-      program.programId
-    );
+
 
     const [dataAccAddress, dataAccAddressBump] = await anchor.web3.PublicKey.findProgramAddress(
       [Buffer.from("data")],
@@ -317,13 +383,12 @@ function App() {
       associatedTokenProgram: spl.ASSOCIATED_TOKEN_PROGRAM_ID,
       tokenProgram:spl.TOKEN_PROGRAM_ID,
       systemProgram: anchor.web3.SystemProgram.programId,
-      
       rent: anchor.web3.SYSVAR_RENT_PUBKEY,
       dataAcc: dataAccAddress,
-      tokenrent: tokenRentAddress,
+      clock:anchor.web3.SYSVAR_CLOCK_PUBKEY,
     }
     //console.log(accounts.rent.toString(), accounts.tokenProgram.toString(), accounts.systemProgram.toString(), accounts.associatedTokenProgram.toString());
-    const tx = await program.rpc.cancel( offerBufferAddressBump, {
+    const tx = await program.rpc.cancel( offerBufferAddressBump, offervalid, {
       accounts: accounts,
       signers: []
     });
@@ -338,6 +403,117 @@ function App() {
     // const account = await program.account.baseAccount.fetch(baseAccount.publicKey);
     // console.log('account: ', account);
     // setValue(account.count.toString());
+  }
+
+
+
+
+
+
+  async function ClosePDA() {
+
+    const provider = await getProvider();
+    const program = new Program(idl, programID, provider);
+    console.log(program.programId.toString())
+
+    console.log(program.provider);
+
+
+    console.log('wallet ', program.provider.wallet.publicKey.toString())
+
+    const idk = await program.account.offer.all();
+    console.log(idk);
+
+    let offer = idk[0];
+    // offer.account.maker;
+
+
+    let NFTTokenMint = new anchor.web3.PublicKey(offer.account.mint);
+    let offerMakerAccount = new anchor.web3.PublicKey(offer.account.maker);
+
+    const [offerBufferAddress, offerBufferAddressBump] = await anchor.web3.PublicKey.findProgramAddress([offerMakerAccount.toBuffer(), NFTTokenMint.toBuffer(), offervalid.toArrayLike(Buffer, 'be', 8)], program.programId);
+
+    console.log("Offer BUffer Address is", offerBufferAddress.toString())
+
+    const [backupdataAccAddress, backupdataAccAddressBump] = await anchor.web3.PublicKey.findProgramAddress(
+      [Buffer.from("backup_data")],
+      program.programId
+    );
+
+
+    const accounts = {
+      offer:offerBufferAddress,
+      systemProgram: anchor.web3.SystemProgram.programId,
+      rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+      backupDataAcc: backupdataAccAddress,
+      pdaRent: pdaRentAddress,
+    }
+    //console.log(accounts.rent.toString(), accounts.tokenProgram.toString(), accounts.systemProgram.toString(), accounts.associatedTokenProgram.toString());
+    const tx = await program.rpc.closeOfferPda(  {
+      accounts: accounts,
+      signers: []
+    });
+    console.log(tx);
+
+    // while ((await program.provider.connection.getSignatureStatus(tx)).value.confirmations === 0) {
+    //   // console.log('sign status', await program.provider.connection.getSignatureStatus(tx1));
+    // }
+
+
+
+    // const account = await program.account.baseAccount.fetch(baseAccount.publicKey);
+    // console.log('account: ', account);
+    // setValue(account.count.toString());
+  }
+
+  async function CloseStickPDA() {
+
+    const provider = await getProvider();
+    const program = new Program(idl, programID, provider);
+    console.log(program.programId.toString())
+
+    console.log(program.provider);
+
+
+    console.log('wallet ', program.provider.wallet.publicKey.toString())
+
+    const idk = await program.account.stick.all();
+    console.log(idk);
+
+    let offer = idk[0];
+    // offer.account.maker;
+
+    // console.log(i)
+
+
+    let NFTTokenMint = new anchor.web3.PublicKey(offer.account.mint);
+    let offerMakerAccount = new anchor.web3.PublicKey(offer.account.maker);
+    let offerTakerAccount = new anchor.web3.PublicKey(offer.account.taker);
+
+    const [stickBufferAddress, stickBufferAddressBump] = await anchor.web3.PublicKey.findProgramAddress([offerMakerAccount.toBuffer(), NFTTokenMint.toBuffer(), offerTakerAccount.toBuffer(), offervalid.toArrayLike(Buffer, 'be', 8)], program.programId);
+
+  
+
+    const [backupdataAccAddress, backupdataAccAddressBump] = await anchor.web3.PublicKey.findProgramAddress(
+      [Buffer.from("backup_data")],
+      program.programId
+    );
+
+
+    const accounts = {
+      stick:stickBufferAddress,
+      systemProgram: anchor.web3.SystemProgram.programId,
+      clock:anchor.web3.SYSVAR_CLOCK_PUBKEY,
+      rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+      backupDataAcc: backupdataAccAddress,
+      pdaRent: pdaRentAddress,
+    }
+    //console.log(accounts.rent.toString(), accounts.tokenProgram.toString(), accounts.systemProgram.toString(), accounts.associatedTokenProgram.toString());
+    const tx = await program.rpc.closeStickPda(  {
+      accounts: accounts,
+      signers: []
+    });
+    console.log(tx);
   }
 
 
@@ -355,7 +531,10 @@ function App() {
       <div className="App">
         <div>
 
-          <button onClick={initContract}> Init Contract </button> 
+          <button onClick={initContract}>INIT CONTRACT</button>
+          <br/>
+          <br/>
+          <button onClick={updatePda}> UPDATE PDA</button>
           <br/>
           <br/>
           <button onClick={makeOfferForNft}>Make Offer For NFT</button>
@@ -364,7 +543,15 @@ function App() {
           <button onClick={AcceptOffer}>Accept Offer</button>
           <br/>
           <br/>
-          <button onClick={CancelListing}>Cancel Listing</button>
+          <br/>
+          <br/>
+          <button onClick={ClosePDA}>Close PDA</button>
+          <br/>
+          <br/>
+          <button onClick={CloseStickPDA}>Close Stick PDA</button>
+          <br/>
+          <br/>
+          <button onClick={CancelOffer}>Cancel Offer</button>
 
         </div>
       </div>
