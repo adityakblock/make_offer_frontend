@@ -1,0 +1,23 @@
+{
+
+    "config": {
+        "marketplace_revenue_address": "N7XFLmdE2Z4aaFf3LqBpQQLucsKtD2ixmon66LCJXfU",
+        "token_metadata_program": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+        "pda_rent_account": "rent4QvdfnUXkn3EYqjgCxgvCiaPKacm1NWWkdeQpJc",
+        "contract_initializer": "ARVZ66zY1EUxyu1MhVnWzyrMXsUq8mbwPUfUnvtPJ7Nr"
+    },
+
+    "nft": {
+        "maker": "N7XFLmdE2Z4aaFf3LqBpQQLucsKtD2ixmon66LCJXfU",
+        "mint": "3b4CfwJMPwy4mUJDG3Ex4e6WQL8mYbNnbaEdodP8AWAS",
+        "creator0": "BwFQjJUiGy1pyczi7nvkemssPdradVsnUSbpvCsiFdXu",
+        "creator1": "EqBCGzzRGLcdoKprDiJFtoMGHYL3idfdcHqNvXjtQKGP",
+        "creator2": "EqBCGzzRGLcdoKprDiJFtoMGHYL3idfdcHqNvXjtQKGP",
+        "creator3": "EqBCGzzRGLcdoKprDiJFtoMGHYL3idfdcHqNvXjtQKGP",
+        "creator4": "EqBCGzzRGLcdoKprDiJFtoMGHYL3idfdcHqNvXjtQKGP",
+        "offer_price": "1.1",
+        "offer_valid": "1640433843"
+
+    }
+
+}

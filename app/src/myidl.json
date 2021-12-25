@@ -1,0 +1,544 @@
+{
+  "version": "0.0.0",
+  "name": "quidproquo",
+  "instructions": [
+    {
+      "name": "new",
+      "accounts": [
+        {
+          "name": "dataAcc",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "beneficiary",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rentAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenrent",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pdaRentAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "dataBump",
+          "type": "u8"
+        },
+        {
+          "name": "mkCut",
+          "type": "u64"
+        },
+        {
+          "name": "rentCut",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "makeOfferForNft",
+      "accounts": [
+        {
+          "name": "offer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "offerMaker",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "nftMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "offerMakersNftAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dataAcc",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenrent",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "offerBump",
+          "type": "u8"
+        },
+        {
+          "name": "offerValid",
+          "type": "i64"
+        },
+        {
+          "name": "nftOfferAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "accept",
+      "accounts": [
+        {
+          "name": "offer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stick",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "offerMaker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "offerTaker",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "offerTakersNftToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "offerMakersNftAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMetadataAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketMaker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenrent",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dataAcc",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "creator0",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creator1",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creator2",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creator3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creator4",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "offerBump",
+          "type": "u8"
+        },
+        {
+          "name": "stickBump",
+          "type": "u8"
+        },
+        {
+          "name": "dataBump",
+          "type": "u8"
+        },
+        {
+          "name": "offerValid",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "cancel",
+      "accounts": [
+        {
+          "name": "offer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "offerMaker",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "nftMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dataAcc",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenrent",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "offerBump",
+          "type": "u8"
+        },
+        {
+          "name": "offerValid",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "closeOfferPda",
+      "accounts": [
+        {
+          "name": "offer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "offerMaker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dataAcc",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pdaRent",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "offerBump",
+          "type": "u8"
+        },
+        {
+          "name": "offerValid",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "closeStickPda",
+      "accounts": [
+        {
+          "name": "stick",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "offerMaker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "offerTaker",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nftMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dataAcc",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pdaRent",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "stickBump",
+          "type": "u8"
+        },
+        {
+          "name": "offerValid",
+          "type": "i64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Data",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "marketPlace",
+            "type": "publicKey"
+          },
+          {
+            "name": "marketPlaceCut",
+            "type": "u64"
+          },
+          {
+            "name": "ataRent",
+            "type": "publicKey"
+          },
+          {
+            "name": "pdaRent",
+            "type": "publicKey"
+          },
+          {
+            "name": "rentCut",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Offer",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maker",
+            "type": "publicKey"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "offerMadeFor",
+            "type": "publicKey"
+          },
+          {
+            "name": "offerAmount",
+            "type": "u64"
+          },
+          {
+            "name": "offerValidTill",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "offerExpired",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Stick",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maker",
+            "type": "publicKey"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "taker",
+            "type": "publicKey"
+          },
+          {
+            "name": "offerValidTill",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "offerExpired",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "address": "DdJumnZ17cGxxYt9RbRoCPBbXK3F8BKyc9u1Lv8kGwJY"
+  }
+}
